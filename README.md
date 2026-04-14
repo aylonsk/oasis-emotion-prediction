@@ -55,7 +55,7 @@ pip install -r requirements.txt
 
 ## Data
 
-Download the OASIS dataset from [benedekkurdi.com/#oasis](https://www.benedekkurdi.com/#oasis) or [https://db.tt/yYTZYCga](https://db.tt/yYTZYCga) and place the images and ratings CSV inside `data/oasis/`.
+Download the OASIS dataset from [benedekkurdi.com/#oasis](https://www.benedekkurdi.com/#oasis) or [https://db.tt/yYTZYCga](https://db.tt/yYTZYCga) and unzip/place the images and ratings CSV inside `data/oasis/`.
 
 ## Training
 
