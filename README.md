@@ -17,15 +17,16 @@ Images are split across four categories: **Animals**, **Objects**, **Scenery**, 
 
 While prior work has analyzed which image categories tend to elicit particular emotional responses, little has examined the predictive power of *color composition* and *semantic category* alone. This project asks:
 
-> Can valence and arousal be reliably predicted from (1) the percentage of an image occupied by each of 20–25 color bins, (2) the image's top five dominant colors, and (3) its OASIS semantic category?
+> Can valence and arousal be reliably predicted from (1) the percentage of an image occupied by each of 11 perceptually distinct color bins, (2) a binary dominance mask over those bins, and (3) the image's OASIS semantic category?
 
 ## Approach
 
-1. **Color features** — Each image is analyzed pixel-by-pixel. Every pixel's hex code is mapped to one of 20–25 perceptual color bins. The result is a percentage-composition vector (one value per bin) plus the top five most dominant colors.
-2. **Semantic features (Experiment 1)** — Use the existing OASIS category labels (Animals, Objects, Scenery, People) as a one-hot semantic feature.
-3. **Semantic features (Experiment 2)** — Replace hand-labeled categories with predictions from a pretrained image classification model and measure whether this changes performance.
-4. **Model** — A CNN (or regression baseline) trained on the combined feature vectors to predict valence and arousal, evaluated with K-fold cross validation. Performance is reported via log loss and visualized through composition charts.
-5. **GUI** — A final interface that accepts any OASIS image and outputs a predicted valence/arousal score alongside a visualization of its color composition.
+1. **Color classifier** — A logistic regression trained on the [XKCD color naming dataset](https://blog.xkcd.com/2010/05/03/color-survey-results/) maps each pixel's RGB value (in CIELAB space) to one of 11 perceptually distinct color bins: red, orange, yellow, green, blue, purple, pink, brown, gray, teal, tan. Bins with poor separability (black, white, olive, maroon, lavender) were dropped after evaluating per-class F1 scores.
+2. **Color features** — Each OASIS image is analyzed pixel-by-pixel using the trained classifier. The result is a percentage-composition vector (fraction of pixels per bin) plus a binary dominance mask.
+3. **Semantic features (Experiment 1)** — Use the existing OASIS category labels (Animals, Objects, Scenery, People) as a one-hot semantic feature.
+4. **Semantic features (Experiment 2)** — Replace hand-labeled categories with predictions from a pretrained image classification model and measure whether this changes performance.
+5. **Model** — A CNN (or regression baseline) trained on the combined feature vectors to predict valence and arousal, evaluated with K-fold cross validation. Performance is reported via log loss and visualized through composition charts.
+6. **GUI** — A final interface that accepts any OASIS image and outputs a predicted valence/arousal score alongside a visualization of its color composition.
 
 ## Project Structure
 
@@ -34,15 +35,17 @@ oasis-emotion-prediction/
 ├── notebooks/
 │   └── final_demo.ipynb       # Polished end-to-end demo (Colab-ready)
 ├── src/
-│   ├── data_loader.py         # Load OASIS images and ratings CSV
-│   ├── color_features.py      # Color bin composition + dominant color extraction
+│   ├── data_loader.py         # Load OASIS images and ratings CSV  [complete]
+│   ├── color_classifier.py    # Train + save XKCD color bin classifier  [complete]
+│   ├── color_features.py      # Per-image bin composition + dominance mask  [complete]
 │   ├── semantic_features.py   # OASIS category encoding and classifier-based semantics
 │   ├── model.py               # Model definition (CNN / regression baseline)
 │   └── train.py               # K-fold training and evaluation pipeline
 ├── models/
-│   └── saved_models/          # Serialized trained models
+│   └── saved_models/          # Serialized trained models (not tracked in git)
 ├── data/
-│   └── oasis/                 # OASIS images and ratings CSV (not tracked in git)
+│   ├── oasis/                 # OASIS images and ratings CSV (not tracked in git)
+│   └── xkcd/                  # XKCD color naming CSV (not tracked in git)
 ├── requirements.txt
 └── README.md
 ```
@@ -55,11 +58,22 @@ pip install -r requirements.txt
 
 ## Data
 
-Download the OASIS dataset from [benedekkurdi.com/#oasis](https://www.benedekkurdi.com/#oasis) or [https://db.tt/yYTZYCga](https://db.tt/yYTZYCga) and unzip/place the images and ratings CSV inside `data/oasis/`.
+**OASIS** — Download from [benedekkurdi.com/#oasis](https://www.benedekkurdi.com/#oasis) or [https://db.tt/yYTZYCga](https://db.tt/yYTZYCga) and place images and the ratings CSV inside `data/oasis/`.
 
-## Training
+**XKCD color naming data** — Required to train the color bin classifier. Place `xkcd_teaching.csv` inside `data/xkcd/`. The CSV must have columns: `r`, `g`, `b`, `term`.
+
+Both datasets are gitignored and must be obtained separately.
+
+## Training the color classifier
+
+Run this once before anything else. It trains the XKCD-based color bin classifier and saves it to `models/saved_models/color_classifier.pkl`:
 
 ```bash
-cd src
-python train.py --csv ../data/oasis/OASIS.csv --images ../data/oasis/images/
+python src/color_classifier.py
+```
+
+## Training the emotion model
+
+```bash
+python src/train.py --csv data/oasis/OASIS.csv --images data/oasis/images/
 ```
