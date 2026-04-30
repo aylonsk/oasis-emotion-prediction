@@ -34,7 +34,15 @@ def build_feature_matrix(image_paths: list[str], metadata) -> np.ndarray:
     For each image, extract color bin composition + dominant colors + semantic
     category and concatenate into a single feature vector.
     """
-    raise NotImplementedError
+
+    for image_path in image_paths:
+        image = load_image(image_path)
+        color_features = extract_color_features(image)
+        semantic_features = extract_semantic_features(image)
+        feature_vector = np.concatenate([color_features, semantic_features])
+        feature_matrix.append(feature_vector)
+
+    return np.array(feature_matrix)
 
 
 def train(csv_path: str, image_dir: str, alpha: float = 1.0):
