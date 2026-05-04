@@ -25,7 +25,7 @@ While prior work has analyzed which image categories tend to elicit particular e
 2. **Color features** — Each OASIS image is analyzed pixel-by-pixel using the trained classifier. The result is a percentage-composition vector (fraction of pixels per bin) plus a binary dominance mask.
 3. **Semantic features (Experiment 1)** — Use the existing OASIS category labels (Animals, Objects, Scenery, People) as a one-hot semantic feature.
 4. **Semantic features (Experiment 2)** — Replace hand-labeled categories with predictions from a pretrained image classification model and measure whether this changes performance.
-5. **Model** — A Ridge baseline or an MLP trained on the combined feature vectors to predict valence and arousal, evaluated with 5-fold cross validation. Performance is reported as mean squared error per fold and visualized through composition charts.
+5. **Models** — A Ridge baseline (linear) and a small MLP (nonlinear, dual-head for valence + arousal) are both trained on the combined feature vectors and compared with 5-fold cross validation. Ridge tests whether the hypothesized signal is recoverable from color + category at all; the MLP tests whether nonlinear feature interactions add anything beyond a linear baseline. Performance is reported as mean squared error per fold.
 6. **GUI** — A final interface that accepts any OASIS image and outputs a predicted valence/arousal score alongside a visualization of its color composition.
 
 ## Project Structure
@@ -60,7 +60,7 @@ pip install -r requirements.txt
 
 **OASIS** — Download from [benedekkurdi.com/#oasis](https://www.benedekkurdi.com/#oasis) or [https://db.tt/yYTZYCga](https://db.tt/yYTZYCga) and place images and the ratings CSV inside `data/oasis/`.
 
-**XKCD color naming data** — Required to train the color bin classifier. Place `xkcd_teaching.csv` inside `data/xkcd/`. The CSV must have columns: `r`, `g`, `b`, `term`.
+**XKCD color naming data** — Required to train the color bin classifier. Download the survey data from the [XKCD color survey blog post](https://blog.xkcd.com/2010/05/03/color-survey-results/) (the post links to the full RGB-name dump), and produce a CSV with columns `r`, `g`, `b`, `term` named `xkcd_teaching.csv` inside `data/xkcd/`.
 
 Both datasets are gitignored and must be obtained separately.
 
