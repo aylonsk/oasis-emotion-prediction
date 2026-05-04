@@ -25,7 +25,7 @@ While prior work has analyzed which image categories tend to elicit particular e
 2. **Color features** — Each OASIS image is analyzed pixel-by-pixel using the trained classifier. The result is a percentage-composition vector (fraction of pixels per bin) plus a binary dominance mask.
 3. **Semantic features (Experiment 1)** — Use the existing OASIS category labels (Animals, Objects, Scenery, People) as a one-hot semantic feature.
 4. **Semantic features (Experiment 2)** — Replace hand-labeled categories with predictions from a pretrained image classification model and measure whether this changes performance.
-5. **Model** — A CNN (or regression baseline) trained on the combined feature vectors to predict valence and arousal, evaluated with K-fold cross validation. Performance is reported via log loss and visualized through composition charts.
+5. **Model** — A Ridge baseline or an MLP trained on the combined feature vectors to predict valence and arousal, evaluated with 5-fold cross validation. Performance is reported as mean squared error per fold and visualized through composition charts.
 6. **GUI** — A final interface that accepts any OASIS image and outputs a predicted valence/arousal score alongside a visualization of its color composition.
 
 ## Project Structure
@@ -39,7 +39,7 @@ oasis-emotion-prediction/
 │   ├── color_classifier.py    # Train + save XKCD color bin classifier  [complete]
 │   ├── color_features.py      # Per-image bin composition + dominance mask  [complete]
 │   ├── semantic_features.py   # OASIS category encoding and classifier-based semantics
-│   ├── model.py               # Model definition (CNN / regression baseline)
+│   ├── model.py               # Ridge baseline + MLP regressor
 │   └── train.py               # K-fold training and evaluation pipeline
 ├── models/
 │   └── saved_models/          # Serialized trained models (not tracked in git)
@@ -74,6 +74,16 @@ python src/color_classifier.py
 
 ## Training the emotion model
 
+`--experiment` selects the semantic-feature source:
+
+- **1** — OASIS `Category` labels.
+- **2** — pretrained ResNet-50 (ImageNet) predictions mapped back to OASIS categories.
+
+`--model` selects the regressor (`ridge` or `mlp`).
+
 ```bash
-python src/train.py --csv data/oasis/OASIS.csv --images data/oasis/images/
+python src/train.py --csv data/oasis/OASIS.csv --images data/oasis/Images --experiment 1 --model ridge
+python src/train.py --csv data/oasis/OASIS.csv --images data/oasis/Images --experiment 2 --model mlp
 ```
+
+Models are saved to `models/saved_models/` with an `_exp{1,2}` suffix.
