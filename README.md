@@ -41,6 +41,9 @@ oasis-emotion-prediction/
 │   ├── semantic_features.py   # OASIS category encoding and classifier-based semantics
 │   ├── model.py               # Ridge baseline + MLP regressor
 │   └── train.py               # K-fold training and evaluation pipeline
+├── scripts/
+│   └── build_gui_data.py      # Pre-compute predictions + thumbnails for the GUI
+├── docs/                      # Static GitHub Pages GUI (predictions.json + thumbs/)
 ├── models/
 │   └── saved_models/          # Serialized trained models (not tracked in git)
 ├── data/
@@ -87,3 +90,15 @@ python src/train.py --csv data/oasis/OASIS.csv --images data/oasis/Images --expe
 ```
 
 Models are saved to `models/saved_models/` with an `_exp{1,2}` suffix.
+
+## GUI
+
+A static page under `docs/` lets you pick any OASIS image and shows the Ridge model's predicted valence/arousal alongside the true labels, squared error, and per-bin color composition. Predictions are baked at build time, so the page is pure HTML/JS — no backend.
+
+After training Experiment 1 (`--experiment 1 --model ridge`), generate the assets:
+
+```bash
+python scripts/build_gui_data.py
+```
+
+This writes `docs/predictions.json` and `docs/thumbs/`. To publish, enable GitHub Pages on `main`/`docs`.

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OASIS Emotion Prediction</title>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>OASIS Emotion Prediction</h1>
+    <p class="sub">Ridge model · Experiment 1 (color bins + OASIS category)</p>
+  </header>
+
+  <main>
+    <section class="controls">
+      <button id="random">Random image</button>
+      <label>Category
+        <select id="category"><option value="">All</option></select>
+      </label>
+      <label>Image
+        <select id="theme"></select>
+      </label>
+    </section>
+
+    <section class="result" id="result" hidden>
+      <div class="image-card">
+        <img id="thumb" alt="">
+        <p class="caption"><span id="theme-label"></span> · <span id="category-label"></span></p>
+      </div>
+
+      <div class="prediction-card">
+        <table>
+          <thead>
+            <tr><th></th><th>true</th><th>predicted</th><th>squared error</th></tr>
+          </thead>
+          <tbody>
+            <tr><th>valence</th><td id="tv"></td><td id="pv"></td><td id="ev"></td></tr>
+            <tr><th>arousal</th><td id="ta"></td><td id="pa"></td><td id="ea"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="composition-card">
+        <h2>Color composition</h2>
+        <ul id="bins"></ul>
+      </div>
+    </section>
+
+    <p class="error" id="error" hidden></p>
+  </main>
+
+  <footer>
+    <p>
+      Predictions baked from the trained Ridge model. Dataset: OASIS
+      (<a href="https://www.benedekkurdi.com/#oasis">Kurdi et&nbsp;al., 2017</a>).
+      Source: <a href="https://github.com/aylonsk/oasis-emotion-prediction">github.com/aylonsk/oasis-emotion-prediction</a>.
+    </p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
