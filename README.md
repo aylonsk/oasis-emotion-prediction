@@ -102,3 +102,17 @@ python scripts/build_gui_data.py
 ```
 
 This writes `docs/predictions.json` and `docs/thumbs/`. To publish, enable GitHub Pages on `main`/`docs`.
+
+## Deployment (GitHub Pages)
+
+This repository includes a GitHub Actions workflow that automatically deploys the static site in the `docs/` folder to GitHub Pages whenever you push to `main` or `master`.
+
+What I added:
+- A workflow at `.github/workflows/deploy-pages.yml` that uploads the `docs/` folder as a Pages artifact and deploys it.
+
+How to publish:
+1. Ensure the `docs/` folder contains `index.html`, `script.js`, `style.css`, `predictions.json` and `thumbs/` (use `python scripts/build_gui_data.py`).
+2. Commit and push the changes to `main` (or `master`). The `deploy-pages` workflow will run and publish the site.
+3. In your repository settings > Pages you can confirm the site; the action deploys automatically so no further manual action is required. The site will be available at `https://<your-username>.github.io/<repo-name>/`.
+
+If you'd like, I can commit and attempt to push these changes for you from this environment.
